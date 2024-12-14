@@ -331,6 +331,8 @@
   )
 )
 
+
+;; Get total tips received
 (define-read-only (get-total-tips-received (recipient principal))
   (let 
     (
@@ -344,7 +346,7 @@
   )
 )
 
-
+;; Get total tips sent
 (define-read-only (get-total-tips-sent (sender principal))
   (let 
     (
@@ -358,6 +360,7 @@
   )
 )
 
+;; Get reward points
 (define-read-only (get-reward-points (sender principal) (amount uint))
   (let 
     (
