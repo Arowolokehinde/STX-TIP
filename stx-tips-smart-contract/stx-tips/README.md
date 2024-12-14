@@ -1,8 +1,14 @@
+
+
+
+
+
 # README for "Tip-stacks Enhanced" Smart Contract
 
 ## Overview
 
-**Tip-stacks Enhanced** is a decentralized tipping platform built on the Stacks blockchain. It enables users to send and receive tips seamlessly, with advanced features like user statistics, rewards, identity verification, and platform fee handling. Designed for efficiency and transparency, this smart contract promotes decentralized financial interaction.
+**Tip-stacks Enhanced** 
+This is a decentralized tipping platform built on the Stacks blockchain. It enables users to send and receive tips seamlessly, with advanced features like user statistics, rewards, identity verification, and platform fee handling. Designed for efficiency and transparency, this smart contract promotes decentralized financial interaction.
 
 ---
 
