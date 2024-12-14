@@ -1,13 +1,17 @@
-import React, { useState} from 'react';
-import { Bell, Wallet, ChevronDown, Menu, Home, Layout, X } from 'lucide-react';
+  /* eslint-disable */
+
+import React, { useState } from 'react';
+import { Bell, Wallet, ChevronDown, Menu, Home, Layout} from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
 
 // Add wallet interface types
-declare global {
-  interface Window {
+declare global
+{
+  interface Window
+  {
     BitcoinProvider?: {
       connect: () => Promise<string[]>;
       requestAccounts: () => Promise<string[]>;
@@ -22,29 +26,34 @@ declare global {
   }
 }
 
-interface WalletInfo {
+interface WalletInfo
+{
   name: string;
   type: string;
   address: string;
 }
 
-export const Header = () => {
+export const Header = () =>
+{
   const [isOpen, setIsOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState('home');
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
   const [isUsernameModalOpen, setUsernameModalOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [connectedWallets, setConnectedWallets] = useState<WalletInfo[]>([]);
-  const [selectedWallet, setSelectedWallet] = useState<string>("");
+  console.log(isOpen)
 
-  const {walletConnected, setWalletConnected, walletAddress, setWalletAddress, connectWallet, disconnectWallet} = useAppContext();
+  const { walletConnected, setWalletConnected, walletAddress, setWalletAddress, currentPage, setCurrentPage } = useAppContext();
 
-  const connectXverseWallet = async (): Promise<void> => {
-    try {
-      if (window.BitcoinProvider) {
+  const connectXverseWallet = async (): Promise<void> =>
+  {
+    try
+    {
+      if (window.BitcoinProvider)
+      {
         const accounts = await window.BitcoinProvider.connect();
-        if (accounts && accounts.length > 0) {
+        if (accounts && accounts.length > 0)
+        {
           const walletInfo = {
             name: 'Xverse',
             type: 'bitcoin',
@@ -56,17 +65,22 @@ export const Header = () => {
           setWalletModalOpen(false);
           setUsernameModalOpen(true);
         }
-      } else {
+      } else
+      {
         window.open('https://www.xverse.app/', '_blank');
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error connecting Xverse wallet:', error);
     }
   };
 
-  const connectLethalWallet = async (): Promise<void> => {
-    try {
-      if (window.lethalProvider) {
+  const connectLethalWallet = async (): Promise<void> =>
+  {
+    try
+    {
+      if (window.lethalProvider)
+      {
         const { address } = await window.lethalProvider.connect();
         const walletInfo = {
           name: 'Lethal',
@@ -78,22 +92,26 @@ export const Header = () => {
         setWalletConnected(true);
         setWalletModalOpen(false);
         setUsernameModalOpen(true);
-      } else {
+      } else
+      {
         window.open('https://lethal.app/', '_blank');
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error connecting Lethal wallet:', error);
     }
   };
 
-  const handleUsernameSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUsernameSubmit = async (e: React.FormEvent<HTMLFormElement>) =>
+  {
     e.preventDefault();
     if (!username.trim() || !walletAddress) return;
 
-    try {
+    try
+    {
       setIsLoading(true);
       const memoCode = Math.random().toString(36).substring(2, 15);
-      
+
       const response = await fetch('/api/users/wallet', {
         method: 'POST',
         headers: {
@@ -107,20 +125,24 @@ export const Header = () => {
         }),
       });
 
-      if (!response.ok) {
+      if (!response.ok)
+      {
         throw new Error('Failed to save user data');
       }
 
       setUsernameModalOpen(false);
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Failed to save user data:', error);
       alert('Failed to save user data. Please try again.');
-    } finally {
+    } finally
+    {
       setIsLoading(false);
     }
   };
 
-  const toggleDashboard = () => {
+  const toggleDashboard = () =>
+  {
     setCurrentPage(currentPage === 'home' ? 'dashboard' : 'home');
   };
 
@@ -140,45 +162,27 @@ export const Header = () => {
                 TipStack
               </div>
             </div>
-            {walletConnected && (
-              <button
-                onClick={toggleDashboard}
-                className="hidden md:flex items-center space-x-2 px-4 py-2 text-sm rounded-lg hover:bg-gray-100 transition-all duration-200 ease-in-out"
-              >
-                {currentPage === 'home' ? (
-                  <>
-                    <Layout className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </>
-                ) : (
-                  <div className="flex gap-2 items-center justify-center ml-40">
-                    <Home className="h-4 w-4" />
-                    <span>Home</span>
-                  </div>
-                )}
-              </button>
-            )}
+            {/* Removed walletConnected condition here */}
+            <button
+              onClick={toggleDashboard}
+              className="hidden md:flex items-center space-x-2 px-4 py-2 text-sm rounded-lg hover:bg-gray-100 transition-all duration-200 ease-in-out"
+            >
+              {currentPage === 'home' ? (
+                <>
+                  <Layout className="h-4 w-4" />
+                  <span>Dashboard</span>
+                </>
+              ) : (
+                <div className="flex gap-2 items-center justify-center ml-40">
+                  <Home className="h-4 w-4" />
+                  <span>Home</span>
+                </div>
+              )}
+            </button>
           </div>
 
           {/* Right section */}
           <div className="flex items-center space-x-4">
-            {/* {currentPage === 'home' && (
-              <nav className="hidden md:flex items-center space-x-8 mr-6">
-                <a href="#features" className="text-sm font-medium relative group">
-                  <span className="text-gray-700 group-hover:text-violet-600 transition-colors">Features</span>
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-violet-600 group-hover:w-full transition-all duration-200"></span>
-                </a>
-                <a href="#about" className="text-sm font-medium relative group">
-                  <span className="text-gray-700 group-hover:text-violet-600 transition-colors">About</span>
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-violet-600 group-hover:w-full transition-all duration-200"></span>
-                </a>
-                <a href="#contact" className="text-sm font-medium relative group">
-                  <span className="text-gray-700 group-hover:text-violet-600 transition-colors">Contact</span>
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-violet-600 group-hover:w-full transition-all duration-200"></span>
-                </a>
-              </nav>
-            )} */}
-
             {walletConnected && (
               <button className="p-2 rounded-full hover:bg-gray-100 relative transition-colors">
                 <Bell className="h-6 w-6" />

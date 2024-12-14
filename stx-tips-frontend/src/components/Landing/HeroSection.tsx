@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { ArrowRight, Sparkles, Users, Shield, Zap } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,9 @@ export const HeroSection = () => {
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
   const [isUsernameModalOpen, setUsernameModalOpen] = useState(false);
   const [username, setUsername] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
-  const {walletConnected, setWalletConnected, walletAddress, setWalletAddress} = useAppContext();
+  const {walletConnected, setWalletConnected,  setWalletAddress} = useAppContext();
 
   const connectXverseWallet = async () => {
     try {
@@ -180,10 +180,11 @@ export const HeroSection = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full"
-              disabled={isLoading}
+              // disabled={isLoading}
             />
-            <Button disabled={isLoading || !username.trim()}>
-              {isLoading ? 'Saving...' : 'Continue'}
+            <Button disabled={!username.trim()}>
+              {/* {isLoading ? 'Saving...' : 'Continue'} */}
+              Continue
             </Button>
           </form>
         </DialogContent>
