@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Natours</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #fafafa;
+            color: #222;
+        }
+
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #0070f3;
+            text-align: center;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn a {
+            display: inline-block;
+            padding: 12px 24px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            background-color: #0070f3;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #1e9e57;
+            text-decoration: underline;
+        }
+
+        .name {
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-wrapper">
+        <h1>Welcome to STours!</h1>
+        <p class="name">
+            Hello <%= user.name %>,
+        </p>
+        <p>We're glad to have you 🎉🙏</p>
+        <p>We're all a big family here, so make sure to upload your user photo so we get to know you a bit better!</p>
+
+        <p style="margin-top: 7px; margin-bottom: 4px;">If you need any help with booking your next tour, please don't
+            hesitate to contact me!</p>
+        <p>- Kenny, CEO</p>
+
+        <div class="footer">
+            <p>If you have any questions, feel free to contact us at
+                <a href="mailto:thesoftnode@gmail.com">support@Stours.com</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

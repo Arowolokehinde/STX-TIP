@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { showConnect } from '@stacks/connect';
-import { StacksTestnet } from '@stacks/network';
+// import { StacksTestnet } from '@stacks/network';
 import { APP_CONFIG } from '@/lib/constants';
 
 export const useWallet = () =>
@@ -15,13 +15,13 @@ export const useWallet = () =>
                 name: APP_CONFIG.NAME,
                 icon: window.location.origin + APP_CONFIG.ICON,
             },
-            onFinish: (data) =>
+            onFinish: () =>
             {
-                setWalletAddress(data.stacksAddress);
+                // setWalletAddress(data.stacksAddress);
                 setWalletConnected(true);
             },
             userSession: undefined,
-            network: new StacksTestnet(),
+            // network: new StacksTestnet(),
         });
     }, []);
 

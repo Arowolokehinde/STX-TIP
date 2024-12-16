@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TipStack Account Verification</title>
+  <style>
+    /* Reset styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #4a5568;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .header {
+      text-align: center;
+      color: #ffffff;
+    }
+
+    .brand-name {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color:rgba(6, 2, 75, 0.3)
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
+
+    .body {
+      padding: 40px 32px;
+      text-align: left;
+      background-color: #ffffff;
+    }
+
+    .body p {
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #4a5568;
+    }
+
+    .verification-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      color: #ffffff !important;
+      padding: 16px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin: 32px 0;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+
+    .verification-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+    }
+
+    .info-box {
+      background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+      border-left: 4px solid #6366f1;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 24px 0;
+    }
+
+    .footer {
+      background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+      text-align: center;
+      padding: 32px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .footer p {
+      margin: 0;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .footer a {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .footer a:hover {
+      color: #6366f1;
+    }
+
+    .social-links {
+      margin-top: 20px;
+    }
+
+    .social-links a {
+      margin: 0 8px;
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    /* Responsive Design */
+    @media only screen and (max-width: 600px) {
+      .container {
+        margin: 10px;
+        border-radius: 12px;
+      }
+
+      .header {
+        padding: 32px 20px;
+      }
+
+      .brand-name {
+        font-size: 36px;
+      }
+
+      .body {
+        padding: 32px 20px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .verification-button {
+        padding: 14px 28px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand-name">TipStack</div>
+      <h1>Verify Your Account</h1>
+    </div>
+    <div class="body">
+      <p class="greeting">Hello <%= user.email %>,</p>
+      <p>Welcome to TipStack! To ensure the security of your account and start sending tips, please verify your email
+        address by clicking the button below:</p>
+
+      <div style="text-align: center;">
+        <a href="<%= verificationURL %>" class="verification-button">
+          Verify Your Account
+        </a>
+      </div>
+
+      <div class="info-box">
+        <p style="margin-bottom: 0;">
+          If you're having trouble clicking the button, you can also copy and paste this URL into your browser:
+          <br>
+          <span style="color: #4f46e5; word-break: break-all;">
+            <%= verificationURL %>
+          </span>
+        </p>
+      </div>
+
+      <p style="margin-top: 24px;">This verification link will expire in 24 hours. If you did not create a TipStack
+        account, please disregard this email.</p>
+    </div>
+    <div class="footer">
+      <p>Need help? Contact us at <a href="mailto:support@tipstack.com">support@tipstack.com</a></p>
+      <div class="social-links">
+        <a href="#">Twitter</a> •
+        <a href="#">Discord</a> •
+        <a href="#">Telegram</a>
+      </div>
+      <p style="margin-top: 20px;">© 2024 TipStack. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState} from 'react';
 import { 
   Wallet, 
   TrendingUp, 
-  Users, 
-  DollarSign, 
+  
   Award, 
-  History,
   ArrowUpCircle,
   ArrowDownCircle,
   Clock
@@ -28,8 +26,7 @@ import {
 } from 'recharts';
 
 export const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [showTipModal, setShowTipModal] = useState(false);
+  // const [showTipModal, setShowTipModal] = useState(false);
   const [tipAmount, setTipAmount] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
 
@@ -91,7 +88,7 @@ export const Dashboard = () => {
   const handleSendTip = () => {
     // Implement tip sending logic here
     console.log('Sending tip:', { recipientAddress, tipAmount });
-    setShowTipModal(false);
+    // setShowTipModal(false);
   };
 
   return (
