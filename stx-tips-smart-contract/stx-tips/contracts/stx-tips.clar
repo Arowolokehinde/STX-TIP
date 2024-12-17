@@ -59,6 +59,7 @@
     verified: bool
 })
 
+(define-map username-registry (string-ascii 50) bool)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; Helper Functions ;;;;;;;;;;;
@@ -291,18 +292,32 @@
 )
 
 
-
-
 (define-public (set-user-identity (user principal) (username (string-ascii 50)))
     (begin
+        ;; Ensure username is not empty
+        (asserts! (> (len username) u0) (err ERR_INVALID_USERNAME))
+        
+        ;; Ensure username is not too short or too long
+        (asserts! (and (>= (len username) u3) (<= (len username) u20)) (err ERR_INVALID_USERNAME_LENGTH))
+        
+        ;; Check if username is already taken
+        (asserts! (is-none (map-get? username-registry username)) (err ERR_USERNAME_TAKEN))
+        
+        ;; Optional: Add verification that the user is setting their own identity
+        (asserts! (is-eq user tx-sender) (err ERR_UNAUTHORIZED))
+        
+        ;; Register the username
+        (map-set username-registry username true)
+        
+        ;; Set user identity
         (map-set user-identity user {
             username: username,
             verified: true
         })
+        
         (ok true)
     )
 )
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
