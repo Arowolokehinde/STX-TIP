@@ -4,12 +4,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; Constants ;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-constant CONTRACT_OWNER 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6)
+(define-constant CONTRACT_OWNER 'STFPYA06K2F5BY0ESPY7HMK70WEAEXBFF20HGPYX)
 (define-constant PLATFORM_FEE_PERCENTAGE u5)
 (define-constant MAX_TIP_AMOUNT u1000000000)  ;; 1000 STX
 (define-constant REWARD_THRESHOLD u1000000)   ;; 1 STX
 (define-constant REWARD_RATE u10)
-
+(define-constant ALLOWED_TOKENS (list 
+    "STX" 
+    "BTC" 
+))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;  Error codes  ;;;;;;;;;;
@@ -20,6 +23,17 @@
 (define-constant ERR_INVALID_AMOUNT (err u2))
 (define-constant ERR_TRANSFER_FAILED (err u3))
 (define-constant ERR_REWARD_UPDATE_FAILED (err u4))
+
+;; Added new error constants
+(define-constant ERR_INVALID_USERNAME (err u8))
+(define-constant ERR_INVALID_USERNAME_LENGTH (err u9))
+(define-constant ERR_USERNAME_TAKEN (err u10))
+(define-constant ERR_UNAUTHORIZED (err u6))
+(define-constant ERR_INVALID_REWARD_RATE (err u7))
+(define-constant MAX_REWARD_RATE u100)
+(define-constant ERR_INVALID_TOKEN_TYPE (err u11))
+(define-constant ERR_INVALID_RECIPIENT (err u5))
+
 
 
 
@@ -70,6 +84,8 @@
         reward-points: u0
     }
 )
+
+
 
 ;; Process tip transfer
 (define-private (process-tip-transfer (recipient principal) (tip-amount uint) (platform-fee uint))
@@ -199,6 +215,24 @@
     )
 )
 
+
+
+
+(define-private (is-valid-recipient (recipient principal))
+    (and 
+        (not (is-eq recipient CONTRACT_OWNER)) 
+        (not (is-eq recipient tx-sender))
+    )
+)
+
+
+(define-private (is-valid-token-type (token-type (string-ascii 3)))
+    (is-some (index-of ALLOWED_TOKENS token-type))
+)
+
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; Public ;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -207,33 +241,38 @@
 (define-public (tip 
     (recipient principal) 
     (amount uint)
-    (token-type (string-ascii 32))
+    (token-type (string-ascii 3))
 )
-  (let 
-    (
-      (platform-fee (calculate-platform-fee amount))
-      (tip-amount (calculate-tip-amount amount platform-fee))
-    )
-    ;; Safety Checks
-    (asserts! (check-tip-amount amount) (err ERR_INVALID_AMOUNT))
-    
-    ;; Token Transfer Logic
-    (try! (transfer-tip recipient tip-amount))
-    (try! (transfer-platform-fee platform-fee))
+  (begin
+          ;; Add recipient validation
+          (asserts! (is-valid-recipient recipient) (err ERR_INVALID_RECIPIENT))
+          (asserts! (is-valid-token-type token-type) (err ERR_INVALID_TOKEN_TYPE))
 
-    ;; Update Stats
-    (update-sender-stats tx-sender amount)
-    (update-recipient-stats recipient amount)
-    
-    ;; Log Transaction
-    (log-transaction tx-sender recipient tip-amount platform-fee token-type)
-    
-    ;; Reward System
-    (update-reward-points tx-sender amount)
-    
-    (ok true)
-  )
-)
+    (let 
+      (
+        (platform-fee (calculate-platform-fee amount))
+        (tip-amount (calculate-tip-amount amount platform-fee))
+      )
+      ;; Safety Checks
+      (asserts! (check-tip-amount amount) (err ERR_INVALID_AMOUNT))
+      
+      ;; Token Transfer Logic
+      (try! (transfer-tip recipient tip-amount))
+      (try! (transfer-platform-fee platform-fee))
+
+      ;; Update Stats
+      (update-sender-stats tx-sender amount)
+      (update-recipient-stats recipient amount)
+      
+      ;; Log Transaction
+      (log-transaction tx-sender recipient tip-amount platform-fee token-type)
+      
+      ;; Reward System
+      (update-reward-points tx-sender amount)
+      
+      (ok true)
+    )
+  ))
 
 ;; Additional Function
 (define-public (update-user-reward-points (user principal) (reward-rate uint))
@@ -250,6 +289,8 @@
     (err ERR_REWARD_UPDATE_FAILED)
   )
 )
+
+
 
 
 (define-public (set-user-identity (user principal) (username (string-ascii 50)))
@@ -378,3 +419,6 @@
     )
   )
 )
+
+
+
