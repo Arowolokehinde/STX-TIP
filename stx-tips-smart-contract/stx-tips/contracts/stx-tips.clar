@@ -4,7 +4,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; Constants ;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-constant CONTRACT_OWNER 'STFPYA06K2F5BY0ESPY7HMK70WEAEXBFF20HGPYX)
+(define-constant CONTRACT_OWNER 'SP3JS36JS023FDNATGSDQ3Y71XSJHT2QDHB1CV3E)
 (define-constant PLATFORM_FEE_PERCENTAGE u5)
 (define-constant MAX_TIP_AMOUNT u1000000000)  ;; 1000 STX
 (define-constant REWARD_THRESHOLD u1000000)   ;; 1 STX
@@ -33,8 +33,8 @@
 (define-constant MAX_REWARD_RATE u100)
 (define-constant ERR_INVALID_TOKEN_TYPE (err u11))
 (define-constant ERR_INVALID_RECIPIENT (err u5))
-
-
+;; Add new error constant for invalid user
+(define-constant ERR_INVALID_USER (err u12))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -231,6 +231,14 @@
     (is-some (index-of ALLOWED_TOKENS token-type))
 )
 
+;; Add a helper function to validate user
+(define-private (is-valid-user (user principal))
+    (and 
+        ;; Prevent zero or contract owner address
+        (not (is-eq user CONTRACT_OWNER))
+        ;; (not (is-eq user tx-sender))
+    )
+)
 
 
 
@@ -275,22 +283,31 @@
     )
   ))
 
-;; Additional Function
 (define-public (update-user-reward-points (user principal) (reward-rate uint))
-  (match (map-get? user-tip-stats user)
-    current-stats 
     (begin
-      (map-set user-tip-stats user 
-        (merge current-stats {
-          reward-points: (+ (get reward-points current-stats) reward-rate)
-        })
-      )
-      (ok true)
+        ;; Ensure only the contract owner can update reward points
+        (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED))
+        
+        ;; Validate the user principal
+        (asserts! (is-valid-user user) (err ERR_INVALID_USER))
+        
+        ;; Add a reasonable upper limit for reward rate
+        (asserts! (< reward-rate MAX_REWARD_RATE) (err ERR_INVALID_REWARD_RATE))
+        
+        (match (map-get? user-tip-stats user)
+            current-stats 
+            (begin
+                (map-set user-tip-stats user 
+                    (merge current-stats {
+                        reward-points: (+ (get reward-points current-stats) reward-rate)
+                    })
+                )
+                (ok true)
+            )
+            (err ERR_REWARD_UPDATE_FAILED)
+        )
     )
-    (err ERR_REWARD_UPDATE_FAILED)
-  )
 )
-
 
 (define-public (set-user-identity (user principal) (username (string-ascii 50)))
     (begin
