@@ -132,11 +132,11 @@ const VerifiedUsers: React.FC = () => {
         </div>
       </div>
 
-      <Dialog open={isQuickSendOpen} onOpenChange={setIsQuickSendOpen}>
+      {/* <Dialog open={isQuickSendOpen} onOpenChange={setIsQuickSendOpen}>
         <DialogContent className="sm:max-w-md bg-gray-900/95 border-white/10">
           <QuickSend initialAddress={selectedUser?.wallet} />
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 };
