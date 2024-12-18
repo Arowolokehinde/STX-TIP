@@ -185,11 +185,25 @@ export const checkUserExists = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get all verified users
+export const getVerifiedUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find({ isverified: true })
+    .select('email wallet')
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    success: true,
+    count: users.length,
+    data: users
+  });
+});
+
 export default {
   submitUserDetails,
   verifyAccount,
   sendTipNotification,
   getUserByWallet,
   getUserByEmail,
-  checkUserExists
+  checkUserExists,
+  getVerifiedUsers
 };

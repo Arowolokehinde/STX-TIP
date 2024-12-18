@@ -37,3 +37,36 @@ export interface Stat {
       };
     };
   }
+
+
+export interface UserStats {
+  totalTipsSent: number;
+  totalTipsReceived: number;
+  rewardPoints: number;
+}
+
+export interface RawUserStats {
+  'total-tips-sent': { value: bigint };
+  'total-tips-received': { value: bigint };
+  'reward-points': { value: bigint };
+}
+
+export interface TipHistoryEntry {
+  amount: number;
+  fee: number;
+  tokenType: string;
+  timestamp: number;
+}
+
+export interface RawTipHistoryEntry {
+  amount: { value: bigint };
+  fee: { value: bigint };
+  'token-type': { value: string };
+  timestamp: { value: bigint };
+}
+
+export interface SendTipParams {
+  recipient: string;
+  amount: number;
+  tokenType?: string;
+}

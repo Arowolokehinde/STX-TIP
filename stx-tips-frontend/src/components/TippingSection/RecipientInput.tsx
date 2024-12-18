@@ -12,6 +12,7 @@ interface RecipientInputProps {
     email?: string;
     found?: boolean;
   };
+  disabled?: boolean;
 }
 
 export const RecipientInput: React.FC<RecipientInputProps> = ({
@@ -20,6 +21,7 @@ export const RecipientInput: React.FC<RecipientInputProps> = ({
   searching,
   validationError,
   userInfo,
+  disabled = false
 }) => {
   return (
     <div className="space-y-2">
@@ -34,6 +36,7 @@ export const RecipientInput: React.FC<RecipientInputProps> = ({
           className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
           value={recipientInput}
           onChange={(e) => setRecipientInput(e.target.value)}
+          disabled={disabled}
         />
         <AnimatePresence>
           {searching && (
