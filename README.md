@@ -23,6 +23,8 @@ TiP Stacks is a decentralized tipping platform built on the Stacks blockchain bu
 
 ---
 
+## Firstly, you have to connect wallet, then you would join community and then you can view your dashboard
+
 <img width="1440" alt="Screenshot 2024-12-14 at 9 46 29 PM" src="https://github.com/user-attachments/assets/477ccfba-7090-420d-8aa3-4a03a8351300" />
 
 <img width="1439" alt="Screenshot 2024-12-14 at 9 46 47 PM" src="https://github.com/user-attachments/assets/62c0f69c-9348-48bc-8b93-f42f585f3865" />
