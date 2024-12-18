@@ -162,27 +162,15 @@
       <h1>Verify Your Account</h1>
     </div>
     <div class="body">
-      <p class="greeting">Hello <%= user.email %>,</p>
+      <p class="greeting">Hello 🙌</p>
       <p>Welcome to TipStack! To ensure the security of your account and start sending tips, please verify your email
-        address by clicking the button below:</p>
+        address using the code below:</p>
 
-      <div style="text-align: center;">
-        <a href="<%= verificationURL %>" class="verification-button">
-          Verify Your Account
-        </a>
+      <div style="text-align: center; font-size: larger; font-weight: bold; color: indigo;">
+        <%= activationCode %> 
       </div>
 
-      <div class="info-box">
-        <p style="margin-bottom: 0;">
-          If you're having trouble clicking the button, you can also copy and paste this URL into your browser:
-          <br>
-          <span style="color: #4f46e5; word-break: break-all;">
-            <%= verificationURL %>
-          </span>
-        </p>
-      </div>
-
-      <p style="margin-top: 24px;">This verification link will expire in 24 hours. If you did not create a TipStack
+      <p style="margin-top: 24px;">This verification code will expire in 30 minutes. If you did not create a TipStack
         account, please disregard this email.</p>
     </div>
     <div class="footer">

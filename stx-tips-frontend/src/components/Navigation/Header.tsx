@@ -1,263 +1,260 @@
-  /* eslint-disable */
-
-import React, { useState } from 'react';
-import { Bell, Wallet, ChevronDown, Menu, Home, Layout} from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React, { useContext, useEffect, useState } from 'react';
+import { Bell, Menu, Home, Layout, LogOutIcon, WalletIcon } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import {
+  authenticate,
+  getUserData,
+  signUserOut,
+  userSession,
+} from '@/lib/auth';
+import { UserData } from '@/lib/type';
+import toast from 'react-hot-toast';
+import { authContext } from '@/context/AuthContext';
+import EmailModal from '../Utils/EmailModal';
+import VerifyEmailModal from '../Utils/VerifyEmailModal';
 
-// Add wallet interface types
-declare global
-{
-  interface Window
-  {
-    BitcoinProvider?: {
-      connect: () => Promise<string[]>;
-      requestAccounts: () => Promise<string[]>;
-      getAccounts: () => Promise<string[]>;
-      getNetwork: () => Promise<string>;
-      signMessage: (message: string, address: string) => Promise<{ publicKey: string; signature: string }>;
-    };
-    lethalProvider?: {
-      connect: () => Promise<{ address: string }>;
-      sendTransaction: (params: { to: string; value: string }) => Promise<{ hash: string }>;
-    };
-  }
-}
-
-interface WalletInfo
-{
-  name: string;
-  type: string;
-  address: string;
-}
-
-export const Header = () =>
-{
-  const [isOpen, setIsOpen] = useState(false);
-  const [isWalletModalOpen, setWalletModalOpen] = useState(false);
-  const [isUsernameModalOpen, setUsernameModalOpen] = useState(false);
-  const [username, setUsername] = useState('');
+export const Header = () => {
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [connectedWallets, setConnectedWallets] = useState<WalletInfo[]>([]);
-  console.log(isOpen)
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
-  const { walletConnected, setWalletConnected, walletAddress, setWalletAddress, currentPage, setCurrentPage } = useAppContext();
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
 
-  const connectXverseWallet = async (): Promise<void> =>
-  {
-    try
+  console.log(userData);
+  
+  const {walletAddress, setWalletAddress, currentPage, setCurrentPage, setWalletConnected } = useAppContext();
+  const { dispatch } = useContext(authContext);
+
+  useEffect(() =>
     {
-      if (window.BitcoinProvider)
+      const checkAuth = async () =>
       {
-        const accounts = await window.BitcoinProvider.connect();
-        if (accounts && accounts.length > 0)
+        if (userSession.isSignInPending())
         {
-          const walletInfo = {
-            name: 'Xverse',
-            type: 'bitcoin',
-            address: accounts[0]
-          };
-          setConnectedWallets(prev => [...prev, walletInfo]);
-          setWalletAddress(accounts[0]);
+          const userData = await userSession.handlePendingSignIn();
+          setIsAuthenticated(true);
+          setUserData(userData);
+          setWalletAddress(userData?.profile?.stxAddress?.testnet ?? null);
           setWalletConnected(true);
-          setWalletModalOpen(false);
-          setUsernameModalOpen(true);
+          await checkUserExists(userData?.profile?.stxAddress?.testnet);
+        } else if (userSession.isUserSignedIn())
+        {
+          const userData = getUserData();
+          setIsAuthenticated(true);
+          setUserData(userData);
+          setWalletAddress(userData?.profile?.stxAddress?.testnet ?? null);
+          setWalletConnected(true);
+          await checkUserExists(userData?.profile?.stxAddress?.testnet);
         }
-      } else
+      };
+  
+      checkAuth();
+    }, []);
+
+    const checkUserExists = async (walletAddress: string | null) =>
       {
-        window.open('https://www.xverse.app/', '_blank');
-      }
-    } catch (error)
-    {
-      console.error('Error connecting Xverse wallet:', error);
+        if (!walletAddress) return;
+    
+        try
+        {
+          const response = await fetch(`http://127.0.0.1:5000/api/v1/users/exists?wallet=${walletAddress.toLowerCase()}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+    
+    
+          if (!response.ok)
+          {
+            throw new Error('Failed to check user existence');
+          }
+    
+          const data = await response.json();
+          if (!data.exists)
+          {
+            setIsEmailModalOpen(true);
+          }
+        } catch (error)
+        {
+          console.error('Failed to check user existence:', error);
+        }
+      };
+
+  const handleAuth = () => {
+    if (isAuthenticated) {
+      signUserOut();
+      setWalletAddress(null);
+      setIsAuthenticated(false);
+    } else {
+      authenticate();
     }
   };
 
-  const connectLethalWallet = async (): Promise<void> =>
-  {
-    try
-    {
-      if (window.lethalProvider)
-      {
-        const { address } = await window.lethalProvider.connect();
-        const walletInfo = {
-          name: 'Lethal',
-          type: 'lethal',
-          address
-        };
-        setConnectedWallets(prev => [...prev, walletInfo]);
-        setWalletAddress(address);
-        setWalletConnected(true);
-        setWalletModalOpen(false);
-        setUsernameModalOpen(true);
-      } else
-      {
-        window.open('https://lethal.app/', '_blank');
-      }
-    } catch (error)
-    {
-      console.error('Error connecting Lethal wallet:', error);
-    }
-  };
-
-  const handleUsernameSubmit = async (e: React.FormEvent<HTMLFormElement>) =>
-  {
-    e.preventDefault();
-    if (!username.trim() || !walletAddress) return;
-
-    try
-    {
-      setIsLoading(true);
-      const memoCode = Math.random().toString(36).substring(2, 15);
-
-      const response = await fetch('/api/users/wallet', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          walletAddress,
-          username: username.trim(),
-          memoCode,
-          walletType: connectedWallets.find(w => w.address === walletAddress)?.type || 'unknown'
-        }),
-      });
-
-      if (!response.ok)
-      {
-        throw new Error('Failed to save user data');
-      }
-
-      setUsernameModalOpen(false);
-    } catch (error)
-    {
-      console.error('Failed to save user data:', error);
-      alert('Failed to save user data. Please try again.');
-    } finally
-    {
-      setIsLoading(false);
-    }
-  };
-
-  const toggleDashboard = () =>
-  {
+  const toggleDashboard = () => {
     setCurrentPage(currentPage === 'home' ? 'dashboard' : 'home');
   };
+
+  const formatWalletAddress = (address: string) => {
+    if (!address) return '';
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent<HTMLFormElement>) =>
+    {
+      e.preventDefault();
+      if (!email.trim().toLowerCase() || !walletAddress?.toLowerCase()) return;
+  
+      console.log('email:', email);
+      console.log('wallet:', walletAddress);
+  
+      try
+      {
+        setIsLoading(true);
+  
+        const response = await fetch('http://127.0.0.1:5000/api/v1/users/connect-wallet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email.trim().toLowerCase(),
+            wallet: walletAddress
+          }),
+        });
+  
+        const result = await response.json();
+  
+        if (response.ok)
+        {
+          dispatch({
+            type: "ACTIVATE_USER",
+            payload: {
+              activationToken: result.verificationToken,
+              activation_Code: result.activationCode
+            }
+          })
+  
+          console.log(result.activationCode)
+  
+          setIsLoading(false);
+          setIsVerifyModalOpen(true);
+        }
+        else
+        {
+          toast.error(result.message);
+          setIsLoading(false);
+        }
+  
+        setIsEmailModalOpen(false);
+      } catch (error: any)
+      {
+        console.error('Failed to save user data:', error);
+        toast.error(error.message);
+      } finally
+      {
+        setIsLoading(false);
+      }
+    };
 
   return (
     <>
       <header className="bg-white/80 backdrop-blur-md shadow-lg border-b h-16 fixed top-0 right-0 left-0 z-20">
         <div className="h-full px-4 max-w-7xl mx-auto flex items-center justify-between">
-          {/* Left section - Brand and Toggle */}
+          {/* Left section - Brand and Navigation */}
           <div className="flex items-center space-x-4">
             {currentPage !== 'home' && (
-              <button onClick={() => setIsOpen(true)} className="lg:hidden hover:bg-gray-100 p-2 rounded-full transition-colors">
+              <button className="lg:hidden hover:bg-gray-100 p-2 rounded-full transition-colors">
                 <Menu className="h-6 w-6" />
               </button>
             )}
+            
             <div className="flex items-center space-x-2">
-              <div className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent transform hover:scale-105 transition-transform cursor-pointer">
+              <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent transform hover:scale-105 transition-transform cursor-pointer">
                 TipStack
               </div>
             </div>
-            {/* Removed walletConnected condition here */}
-            <button
-              onClick={toggleDashboard}
-              className="hidden md:flex items-center space-x-2 px-4 py-2 text-sm rounded-lg hover:bg-gray-100 transition-all duration-200 ease-in-out"
-            >
-              {currentPage === 'home' ? (
-                <>
-                  <Layout className="h-4 w-4" />
-                  <span>Dashboard</span>
-                </>
-              ) : (
-                <div className="flex gap-2 items-center justify-center ml-40">
-                  <Home className="h-4 w-4" />
-                  <span>Home</span>
-                </div>
-              )}
-            </button>
+
+            {isAuthenticated && (
+              <button
+                onClick={toggleDashboard}
+                className={`flex items-center space-x-2 px-2 py-1 rounded-lg transition-all duration-200  ${
+                  currentPage === (currentPage === 'home' ? 'dashboard' : 'home')
+                    ? 'bg-gradient-to-r from-violet-600/10 to-purple-600/10 text-purple-700'
+                    : 'hover:bg-gray-100'
+                }`}
+              >
+                {currentPage === 'home' ? (
+                  <>
+                    <Layout className="h-6 w- text-purple-600" />
+                    <span className="md:flex hidden ">Dashboard</span>
+                  </>
+                ) : (
+                  <div className="flex gap-2 items-center justify-center lg:ml-[200px]">
+                    <Home className="h-4 w-4 text-purple-600" />
+                    <span className="md:flex hidden">Home</span>
+                  </div>
+                )}
+              </button>
+            )}
           </div>
 
           {/* Right section */}
           <div className="flex items-center space-x-4">
-            {walletConnected && (
-              <button className="p-2 rounded-full hover:bg-gray-100 relative transition-colors">
-                <Bell className="h-6 w-6" />
-                <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
-              </button>
+            {isAuthenticated && (
+              <>
+                <button className="p-2 rounded-full hover:bg-gray-100 relative transition-colors">
+                  <Bell className="h-6 w-6" />
+                  <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+                </button>
+                
+                <div className="hidden md:flex items-center px-4 py-2 bg-gradient-to-r from-violet-600/10 to-purple-600/10 rounded-lg border border-purple-100">
+                  <WalletIcon className="h-4 w-4 text-purple-600 mr-2" />
+                  <span className="text-sm font-medium text-purple-700">
+                    {formatWalletAddress(walletAddress || '')}
+                  </span>
+                </div>
+              </>
             )}
 
-            {!walletConnected ? (
-              <button
-                onClick={() => setWalletModalOpen(true)}
-                className="bg-gradient-to-r from-violet-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:opacity-90 transition-all duration-200 transform hover:scale-105 shadow-md"
-              >
-                Connect Wallet
-              </button>
-            ) : (
-              <div className="flex items-center space-x-2 bg-gray-100 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-200 transition-all duration-200">
-                <Wallet className="h-5 w-5 text-violet-600" />
-                <span className="text-sm font-medium">{walletAddress?.slice(0, 4)}...{walletAddress?.slice(-4)}</span>
-                <ChevronDown className="h-4 w-4" />
-              </div>
-            )}
+            <button
+              onClick={handleAuth}
+              className="text-sm md:text-base bg-gradient-to-r from-violet-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:opacity-90 transition-all duration-200 transform hover:scale-105 shadow-md flex items-center"
+            >
+              {isAuthenticated ? (
+                <>
+                  <LogOutIcon className="h-5 w-5 mr-2" />
+                  <span className="hidden md:inline">Disconnect</span>
+                </>
+              ) : (
+                <>
+                  <WalletIcon className="h-5 w-5 mr-2" />
+                  <span className="hidden md:inline">Connect Wallet</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Wallet Selection Modal */}
-      <Dialog open={isWalletModalOpen} onOpenChange={setWalletModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Connect Your Wallet</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 p-4">
-            <p className="text-sm text-gray-500 text-center">Select your preferred wallet</p>
-            <div className="grid grid-cols-1 gap-3">
-              <Button
-                variant="outline"
-                onClick={connectXverseWallet}
-                disabled={connectedWallets.some(w => w.name === 'Xverse')}
-                className="w-full flex items-center justify-center space-x-2 p-4 border rounded-lg hover:border-violet-600 transition-all duration-200"
-              >
-                <span className="font-medium">Connect Xverse Wallet</span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={connectLethalWallet}
-                disabled={connectedWallets.some(w => w.name === 'Lethal')}
-                className="w-full flex items-center justify-center space-x-2 p-4 border rounded-lg hover:border-violet-600 transition-all duration-200"
-              >
-                <span className="font-medium">Connect Lethal Wallet</span>
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Email Modal */}
+      <EmailModal
+        isOpen={isEmailModalOpen}
+        onOpenChange={setIsEmailModalOpen}
+        email={email}
+        setEmail={setEmail}
+        handleSubmit={handleEmailSubmit}
+        isLoading={isLoading}
+      />
 
-      {/* Username Modal */}
-      <Dialog open={isUsernameModalOpen} onOpenChange={setUsernameModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Set Your Username</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleUsernameSubmit} className="grid gap-4 py-4">
-            <Input
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full"
-              disabled={isLoading}
-            />
-            <Button type="submit" disabled={isLoading || !username.trim()}>
-              {isLoading ? 'Saving...' : 'Continue'}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {/* Verify Email Modal */}
+      <VerifyEmailModal
+        isOpen={isVerifyModalOpen}
+        onOpenChange={setIsVerifyModalOpen}
+        userEmail={email}
+      />
     </>
   );
 };

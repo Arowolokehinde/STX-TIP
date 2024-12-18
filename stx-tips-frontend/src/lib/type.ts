@@ -29,3 +29,11 @@ export interface Stat {
     username: string;
     memoCode: string;
   }
+
+  export interface UserData {
+    profile: {
+      stxAddress: {
+        mainnet: string;
+      };
+    };
+  }

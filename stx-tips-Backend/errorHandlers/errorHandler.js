@@ -20,10 +20,10 @@ const handleValidationErrorDB = (err) => {
 };
 
 const handleJWTError = () =>
-  new AppError("Invalid token. Please log in again!", 401);
+  new AppError("Invalid token!", 401);
 
 const handleJWTExpiredError = () =>
-  new AppError("Your token has expired! Please log in again.", 401);
+  new AppError("Your token has expired! Click resend token to get another one.", 401);
 
 const sendErrorDev = (err, req, res) => {
   // A) API
