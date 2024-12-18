@@ -3,6 +3,11 @@ TiP Stacks is a decentralized tipping platform built on the Stacks blockchain bu
 
 ---
 
+### Deployed smart contract url
+ https://explorer.hiro.so/txid/0x3cd2275570b99fc8df9168c917ae65c05f44494ef05f8c8ab438e150923badf8?chain=testnet
+ ST3P8GST1CH1QTD2W8VQ9BT60EPBQFWDN9DRGBR64.STX-TIPPPS
+
+
 ## Features
 
 ### Key Features
