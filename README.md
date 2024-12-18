@@ -1,5 +1,5 @@
-**Tip Stacks** 
-TiP Stacks a decentralized tipping platform built on the Stacks blockchain built with AI. It enables users to send and receive tips seamlessly, with advanced features like user statistics, rewards, identity verification, and platform fee handling. Designed for efficiency and transparency, this smart contract promotes decentralized financial interaction.
+## Tip Stacks
+TiP Stacks is a decentralized tipping platform built on the Stacks blockchain built with AI. It enables users to send and receive tips seamlessly, with advanced features like user statistics, rewards, identity verification, and platform fee handling. Designed for efficiency and transparency, this smart contract promotes decentralized financial interaction.
 
 ---
 
