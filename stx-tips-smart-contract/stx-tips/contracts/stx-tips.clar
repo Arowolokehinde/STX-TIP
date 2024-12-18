@@ -4,7 +4,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; Constants ;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define-constant CONTRACT_OWNER 'SP3JS36JS023FDNATGSDQ3Y71XSJHT2QDHB1CV3E)
+(define-constant CONTRACT_OWNER 'STFPYA06K2F5BY0ESPY7HMK70WEAEXBFF20HGPYX)
 (define-constant PLATFORM_FEE_PERCENTAGE u5)
 (define-constant MAX_TIP_AMOUNT u1000000000)  ;; 1000 STX
 (define-constant REWARD_THRESHOLD u1000000)   ;; 1 STX
