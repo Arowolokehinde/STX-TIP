@@ -67,7 +67,7 @@ export const HeroSection = () =>
 
     try
     {
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/users/exists?wallet=${walletAddress.toLowerCase()}`, {
+      const response = await fetch(`https://stx-tip.onrender.com/api/v1/users/exists?wallet=${walletAddress.toLowerCase()}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ export const HeroSection = () =>
     {
       setIsLoading(true);
 
-      const response = await fetch('http://127.0.0.1:5000/api/v1/users/connect-wallet', {
+      const response = await fetch('https://stx-tip.onrender.com/api/v1/users/connect-wallet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
